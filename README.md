@@ -103,11 +103,12 @@ test walks all four paths.
 
 ## How this was built, honestly
 
-This repository was drafted with Claude Code, under my direction, and every policy in it
-was reviewed and corrected by me before it was committed. That is not a caveat; it is the
-point. The job of a senior engineer working with AI is not to avoid the tool but to catch
-what it gets wrong before it ships — and RLS is where it gets things wrong most
-confidently.
+This repository is being drafted with Claude Code, under my direction. That is not a
+caveat; it is the point. The job of a senior engineer working with AI is not to avoid the
+tool but to catch what it gets wrong before it ships — and RLS is where it gets things
+wrong most confidently. I am working through `0002_policies.sql` policy by policy, and
+writing each defect's analysis by hand as I go (see the note below on which ones are
+done) — this file will say so plainly once that pass is finished, not before.
 
 The rule during the build was: **no claim about Postgres behaviour gets written down until
 it has been tested against the live database.** That rule overturned two things the model
@@ -143,7 +144,11 @@ That is the failure mode this whole repository is about: a green test suite and 
 plausible-looking policy are not the same thing as a secure one, and the only way to close
 the gap is to keep attacking your own work after it already "works".
 
-The defect analyses under `defects/` are written by me, in my own words.
+The defect analyses under `defects/` are written by me, in my own words, one at a time —
+this repo is committed as each is finished rather than held back until all seven are
+done, so the commit history reflects the actual pace of the work. A skeleton whose
+`README.md` still opens with "Analysis not yet written" means exactly that: the SQL and
+the test for that defect are real and passing, my write-up of it isn't there yet.
 
 ## Licence
 

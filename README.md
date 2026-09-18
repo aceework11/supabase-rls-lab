@@ -58,20 +58,20 @@ where it is usually not.
 
 ### What the isolation suite proves
 
-| Case                                                                | Asserted on                          |
-| ------------------------------------------------------------------- | ------------------------------------ |
-| A member reads only their own org's projects                        | row set                              |
-| Another org's invoice by id returns zero rows                       | row count                            |
-| A user in no org sees an empty set everywhere                       | row counts                           |
-| An anonymous client sees zero rows everywhere                       | row counts                           |
-| A `count` aggregate covers only the caller's org                    | the aggregate                        |
-| A table with RLS on and no policy returns nothing, even to a member | row count                            |
-| Updating your own row persists                                      | **re-read as service role**          |
-| Updating another org's row changes nothing                          | **0 rows affected, and re-read**     |
+| Case                                                                                                                                                      | Asserted on                              |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| A member reads only their own org's projects                                                                                                              | row set                                  |
+| Another org's invoice by id returns zero rows                                                                                                             | row count                                |
+| A user in no org sees an empty set everywhere                                                                                                             | row counts                               |
+| An anonymous client sees zero rows everywhere                                                                                                             | row counts                               |
+| A `count` aggregate covers only the caller's org                                                                                                          | the aggregate                            |
+| A table with RLS on and no policy returns nothing, even to a member                                                                                       | row count                                |
+| Updating your own row persists                                                                                                                            | **re-read as service role**              |
+| Updating another org's row changes nothing                                                                                                                | **0 rows affected, and re-read**         |
 | Moving your row into another org: PostgREST rejects it, and a **direct connection** (no REST layer to mask the policy) is rejected by `WITH CHECK` itself | error `42501` on both paths, and re-read |
-| A plain member cannot change their own membership role              | **0 rows affected, and re-read**     |
-| A plain member cannot delete an invoice                             | **0 rows, and the row still exists** |
-| Inserting a row into another org is rejected                        | error `42501`                        |
+| A plain member cannot change their own membership role                                                                                                    | **0 rows affected, and re-read**         |
+| A plain member cannot delete an invoice                                                                                                                   | **0 rows, and the row still exists**     |
+| Inserting a row into another org is rejected                                                                                                              | error `42501`                            |
 
 The bold ones are the point. A blocked `UPDATE` or `DELETE` through PostgREST is **not an
 error** — it is `200` with an empty array, because zero rows matched the policy. A suite
@@ -103,12 +103,13 @@ test walks all four paths.
 
 ## How this was built, honestly
 
-This repository is being drafted with Claude Code, under my direction. That is not a
-caveat; it is the point. The job of a senior engineer working with AI is not to avoid the
-tool but to catch what it gets wrong before it ships — and RLS is where it gets things
-wrong most confidently. I am working through `0002_policies.sql` policy by policy, and
-writing each defect's analysis by hand as I go (see the note below on which ones are
-done) — this file will say so plainly once that pass is finished, not before.
+This repository was drafted with Claude Code, under my direction. That is not a caveat; it
+is the point. The job of a senior engineer working with AI is not to avoid the tool but to
+catch what it gets wrong before it ships — and RLS is where it gets things wrong most
+confidently. I went through `0002_policies.sql` policy by policy before anything was
+committed, and the seven analyses under `defects/` are my own account of each defect: what
+the generated version looked like, why it looked right, how it actually breaks, and how
+I'd catch it in review.
 
 The rule during the build was: **no claim about Postgres behaviour gets written down until
 it has been tested against the live database.** That rule overturned two things the model
@@ -144,11 +145,8 @@ That is the failure mode this whole repository is about: a green test suite and 
 plausible-looking policy are not the same thing as a secure one, and the only way to close
 the gap is to keep attacking your own work after it already "works".
 
-The defect analyses under `defects/` are written by me, in my own words, one at a time —
-this repo is committed as each is finished rather than held back until all seven are
-done, so the commit history reflects the actual pace of the work. A skeleton whose
-`README.md` still opens with "Analysis not yet written" means exactly that: the SQL and
-the test for that defect are real and passing, my write-up of it isn't there yet.
+All seven analyses are written. Each links straight back to the exact SQL and the exact
+test it's describing, so nothing in `defects/` asks to be taken on faith.
 
 ## Licence
 

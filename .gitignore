@@ -1,0 +1,10 @@
+.env
+*.log
+node_modules/
+supabase/.temp/
+supabase/.branches/
+.DS_Store
+
+# engine-internal build artifacts, not part of the public repo
+SPEC.md
+BUILD_LOG.md
